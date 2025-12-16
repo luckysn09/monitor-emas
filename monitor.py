@@ -9,7 +9,7 @@ URL = "https://logammulia.com/id/purchase/gold"
 TOKEN = os.environ.get("FONNTE_TOKEN")
 
 TARGETS = [
-    "+628319751188",
+    "+6283197511188",
     "E8l1KMRnTCUDG3ZbQWuQKX"
 ]
 
