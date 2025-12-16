@@ -10,7 +10,7 @@ TOKEN = os.environ.get("FONNTE_TOKEN")
 
 TARGETS = [
     "+6283197511188",
-    "E8l1KMRnTCUDG3ZbQWuQKX"
+    "120363402852110732@g.us"
 ]
 
 GRAM_LIST = [
