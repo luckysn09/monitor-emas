@@ -92,40 +92,27 @@ if os.path.exists(STATUS_FILE):
 if TEST_MODE or (status_baru != status_lama and hasil):
     pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
 
-    # --- PRIORITAS JAKARTA ---
     for lokasi, grams in hasil.items():
-        if any(k in lokasi for k in PRIORITAS_JAKARTA):
-            pesan += f"📍 {lokasi} (PRIORITAS)\n"
-            for g in grams:
-                pesan += f"✅ {g}\n"
-            pesan += "\n"
-
-    # --- LOKASI LAIN ---
-    for lokasi, grams in hasil.items():
-        if not any(k in lokasi for k in PRIORITAS_JAKARTA):
-            pesan += f"📍 {lokasi}\n"
-            for g in grams:
-                pesan += f"✅ {g}\n"
-            pesan += "\n"
+        pesan += f"📍 {lokasi}\n"
+        for g in grams:
+            pesan += f"✅ {g}\n"
+        pesan += "\n"
 
     pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
 
-try:
-    for t in TARGETS:
-        r = requests.post(
-            "https://api.fonnte.com/send",
-            headers={"Authorization": TOKEN},
-            data={
-                "target": t,
-                "message": pesan
-            }
-        )
-
-        # LOG STATUS KIRIM (LANGKAH 3)
-        print(f"[WA SEND] target={t} status={r.status_code} response={r.text}")
+    try:
+        for t in TARGETS:
+            r = requests.post(
+                "https://api.fonnte.com/send",
+                headers={"Authorization": TOKEN},
+                data={
+                    "target": t,
+                    "message": pesan
+                }
+            )
+            print(f"[WA SEND] target={t} status={r.status_code}")
 
     except Exception as e:
-        # kirim ERROR HANYA ke WA pribadi
         error_msg = f"""⚠️ BOT LOGAM MULIA ERROR ⚠️
 
 Pesan error:
@@ -142,7 +129,6 @@ Pesan error:
             }
         )
 
-    # simpan status terakhir
     with open(STATUS_FILE, "w") as f:
         f.write(status_baru)
 
