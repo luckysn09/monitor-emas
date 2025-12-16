@@ -5,7 +5,7 @@ from datetime import datetime
 
 TEST_MODE = True
 
-URL = "https://logammulia.com/id/purchase/gold"
+URL = "xxx"
 TOKEN = os.environ.get("FONNTE_TOKEN")
 
 ADMIN_WA = "+6283197511188"
