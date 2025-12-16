@@ -7,7 +7,7 @@ URL = "https://logammulia.com/id/purchase/gold"
 TOKEN = os.environ.get("FONNTE_TOKEN")
 
 TARGETS = [
-    "+6283197511188",
+    "+628319751188",
     "E8l1KMRnTCUDG3ZbQWuQKX"
 ]
 
@@ -45,26 +45,47 @@ LOKASI = [
     "BELM - Puri Indah"
 ]
 
+STATUS_FILE = "last_status.txt"
+
 res = requests.get(URL, timeout=20)
 soup = BeautifulSoup(res.text, "html.parser")
 text = soup.get_text(separator=" ")
 
-pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
+hasil = {}
 
 for lokasi in LOKASI:
-    pesan += f"📍 {lokasi}\n"
+    tersedia = []
     for gram in GRAM_LIST:
         if gram in text and lokasi in text and "Tersedia" in text:
-            pesan += f"✅ {gram}\n"
-        else:
-            pesan += f"❌ {gram}\n"
-    pesan += "\n"
+            tersedia.append(gram)
+    if tersedia:
+        hasil[lokasi] = tersedia
 
-pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
+status_baru = str(hasil)
 
-for t in TARGETS:
-    requests.post(
-        "https://api.fonnte.com/send",
-        headers={"Authorization": TOKEN},
-        data={"target": t, "message": pesan}
-    )
+status_lama = ""
+if os.path.exists(STATUS_FILE):
+    with open(STATUS_FILE, "r") as f:
+        status_lama = f.read()
+
+# 👉 ANTI SPAM: hanya kirim jika ADA PERUBAHAN
+if status_baru != status_lama and hasil:
+    pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
+
+    for lokasi, grams in hasil.items():
+        pesan += f"📍 {lokasi}\n"
+        for g in grams:
+            pesan += f"✅ {g}\n"
+        pesan += "\n"
+
+    pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
+
+    for t in TARGETS:
+        requests.post(
+            "https://api.fonnte.com/send",
+            headers={"Authorization": TOKEN},
+            data={"target": t, "message": pesan}
+        )
+
+    with open(STATUS_FILE, "w") as f:
+        f.write(status_baru)
