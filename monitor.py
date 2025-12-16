@@ -3,9 +3,7 @@ from bs4 import BeautifulSoup
 import os
 from datetime import datetime
 
-TEST_MODE = True
-
-URL = "https://logammulia.com/salah"
+URL = "https://logammulia.com/id/purchase/gold"
 TOKEN = os.environ.get("FONNTE_TOKEN")
 
 ADMIN_WA = "+6283197511188"
@@ -73,7 +71,7 @@ if os.path.exists(STATUS_FILE):
         status_lama = f.read()
 
 # 👉 ANTI SPAM: hanya kirim jika ADA PERUBAHAN
-if TEST_MODE or (status_baru != status_lama and hasil):
+if (status_baru != status_lama and hasil):
     pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
 
     for lokasi, grams in hasil.items():
