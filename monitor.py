@@ -90,7 +90,10 @@ if TEST_MODE or (status_baru != status_lama and hasil):
         requests.post(
             "https://api.fonnte.com/send",
             headers={"Authorization": TOKEN},
-            data={"target": t, "message": pesan}
+            data={
+                "target": t,
+                "message": pesan
+            }
         )
 
 except Exception as e:
