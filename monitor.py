@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import os
 from datetime import datetime
 
+TEST_MODE = True
+
 URL = "https://logammulia.com/id/purchase/gold"
 TOKEN = os.environ.get("FONNTE_TOKEN")
 
