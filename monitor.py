@@ -1,8 +1,11 @@
+import os
 import requests
 from bs4 import BeautifulSoup
-import os
 from datetime import datetime
 
+# =========================
+# KONFIGURASI UTAMA
+# =========================
 TEST_MODE = False
 URL = "https://logammulia.com/id/purchase/gold"
 TOKEN = os.environ.get("FONNTE_TOKEN")
@@ -15,6 +18,9 @@ TARGETS = [
     "120363402852110732@g.us"
 ]
 
+# =========================
+# DATA PRODUK & LOKASI
+# =========================
 GRAM_LIST = [
     "Emas Batangan - 0.5 gr",
     "Emas Batangan - 1 gr",
@@ -57,10 +63,16 @@ PRIORITAS_JAKARTA = [
     "Puri Indah"
 ]
 
+# =========================
+# FILE SISTEM
+# =========================
 STATUS_FILE = "last_status.txt"
 STAT_BUTIK_FILE = "butik_stats.txt"
 STAT_SENT_FILE = "stat_sent_today.txt"
 
+# =========================
+# AMBIL DATA WEBSITE
+# =========================
 res = requests.get(URL, timeout=20)
 soup = BeautifulSoup(res.text, "html.parser")
 text = soup.get_text(separator=" ")
@@ -72,23 +84,31 @@ for lokasi in LOKASI:
     for gram in GRAM_LIST:
         if gram in text and lokasi in text and "Tersedia" in text:
             tersedia.append(gram)
+
     if tersedia:
         hasil[lokasi] = tersedia
-        
-# --- CATAT STATISTIK BUTIK (SETELAH HASIL TERBENTUK) ---
+
+# =========================
+# CATAT STATISTIK BUTIK
+# =========================
 jam_sekarang = datetime.now().hour
 for butik in hasil.keys():
     with open(STAT_BUTIK_FILE, "a") as f:
         f.write(f"{butik}|{jam_sekarang}\n")
 
+# =========================
+# CEK STATUS TERAKHIR
+# =========================
 status_baru = str(hasil)
-
 status_lama = ""
+
 if os.path.exists(STATUS_FILE):
     with open(STATUS_FILE, "r") as f:
         status_lama = f.read()
 
-# 👉 ANTI SPAM: hanya kirim jika ADA PERUBAHAN
+# =========================
+# KIRIM NOTIFIKASI STOK
+# =========================
 if TEST_MODE or (status_baru != status_lama and hasil):
     pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
 
@@ -132,6 +152,9 @@ Pesan error:
     with open(STATUS_FILE, "w") as f:
         f.write(status_baru)
 
+# =========================
+# FUNGSI STATISTIK BUTIK
+# =========================
 def statistik_butik_paling_sering():
     if not os.path.exists(STAT_BUTIK_FILE):
         return {}
@@ -152,14 +175,16 @@ def statistik_butik_paling_sering():
 
             data[butik][jam] = data[butik].get(jam, 0) + 1
 
-    hasil = {}
+    hasil_stat = {}
     for butik, jam_data in data.items():
         jam_terbanyak = max(jam_data, key=jam_data.get)
-        hasil[butik] = (jam_terbanyak, jam_data[jam_terbanyak])
+        hasil_stat[butik] = (jam_terbanyak, jam_data[jam_terbanyak])
 
-    return hasil
+    return hasil_stat
 
-# --- KIRIM STATISTIK BUTIK JAM 22:00 WIB (ANTI DUPLIKASI) ---
+# =========================
+# KIRIM STATISTIK HARIAN
+# =========================
 sekarang = datetime.now()
 today = sekarang.strftime("%Y-%m-%d")
 
@@ -190,6 +215,5 @@ if sekarang.hour == 22 and sent_today != today:
             }
         )
 
-        # 👉 SIMPAN FLAG HARIAN (PENTING)
         with open(STAT_SENT_FILE, "w") as f:
             f.write(today)
