@@ -48,13 +48,29 @@ LOKASI = [
     "BELM - Puri Indah"
 ]
 
+PRIORITAS_JAKARTA = [
+    "Jakarta",
+    "Pulogadung",
+    "Graha Dipta",
+    "Juanda",
+    "Puri Indah"
+]
+
 STATUS_FILE = "last_status.txt"
+STAT_BUTIK_FILE = "butik_stats.txt"
 
 res = requests.get(URL, timeout=20)
 soup = BeautifulSoup(res.text, "html.parser")
 text = soup.get_text(separator=" ")
 
 hasil = {}
+
+# --- CATAT STATISTIK BUTIK ---
+jam_sekarang = datetime.now().hour
+
+for butik in hasil.keys():
+    with open(STAT_BUTIK_FILE, "a") as f:
+        f.write(f"{butik}|{jam_sekarang}\n")
 
 for lokasi in LOKASI:
     tersedia = []
@@ -75,7 +91,17 @@ if os.path.exists(STATUS_FILE):
 if TEST_MODE or (status_baru != status_lama and hasil):
     pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
 
-    for lokasi, grams in hasil.items():
+    # --- PRIORITAS JAKARTA ---
+for lokasi, grams in hasil.items():
+    if any(k in lokasi for k in PRIORITAS_JAKARTA):
+        pesan += f"📍 {lokasi} (PRIORITAS)\n"
+        for g in grams:
+            pesan += f"✅ {g}\n"
+        pesan += "\n"
+
+# --- LOKASI LAIN ---
+for lokasi, grams in hasil.items():
+    if not any(k in lokasi for k in PRIORITAS_JAKARTA):
         pesan += f"📍 {lokasi}\n"
         for g in grams:
             pesan += f"✅ {g}\n"
@@ -116,3 +142,55 @@ Pesan error:
     # simpan status terakhir
     with open(STATUS_FILE, "w") as f:
         f.write(status_baru)
+
+def statistik_butik_paling_sering():
+    if not os.path.exists(STAT_BUTIK_FILE):
+        return {}
+
+    data = {}
+
+    with open(STAT_BUTIK_FILE, "r") as f:
+        for line in f:
+            if "|" not in line:
+                continue
+
+            butik, jam = line.strip().split("|")
+            if not jam.isdigit():
+                continue
+
+            if butik not in data:
+                data[butik] = {}
+
+            data[butik][jam] = data[butik].get(jam, 0) + 1
+
+    hasil = {}
+    for butik, jam_data in data.items():
+        jam_terbanyak = max(jam_data, key=jam_data.get)
+        hasil[butik] = (jam_terbanyak, jam_data[jam_terbanyak])
+
+    return hasil
+
+# --- KIRIM STATISTIK BUTIK JAM 22:00 WIB ---
+sekarang = datetime.now()
+
+if sekarang.hour == 22:
+    stats = statistik_butik_paling_sering()
+
+    if stats:
+        pesan = "📊 STATISTIK STOK EMAS PER BUTIK\n"
+        pesan += "(Jam paling sering READY)\n\n"
+
+        for butik, (jam, jumlah) in stats.items():
+            pesan += f"🏪 {butik}\n"
+            pesan += f"🕒 Jam {jam}:00 → {jumlah} kali\n\n"
+
+        pesan += f"⏰ {sekarang.strftime('%d-%m-%Y %H:%M WIB')}"
+
+        requests.post(
+            "https://api.fonnte.com/send",
+            headers={"Authorization": TOKEN},
+            data={
+                "target": ADMIN_WA,
+                "message": pesan
+            }
+        )
