@@ -2,7 +2,13 @@ name: Monitor Emas Logam Mulia
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    # SIANG (06:00–22:00 WIB) → tiap 3 menit
+    - cron: "*/3 23-23 * * *"   # 06:00–06:59 WIB
+    - cron: "*/3 0-15 * * *"    # 07:00–22:59 WIB
+
+    # MALAM (22:00–06:00 WIB) → tiap 10 menit
+    - cron: "*/10 16-22 * * *"  # 23:00–05:59 WIB
+
   workflow_dispatch:
 
 jobs:
