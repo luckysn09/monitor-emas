@@ -113,14 +113,17 @@ if TEST_MODE or (status_baru != status_lama and hasil):
     try:
         # kirim NOTIFIKASI STOK (pribadi + grup)
         for t in TARGETS:
-            requests.post(
-                "https://api.fonnte.com/send",
-                headers={"Authorization": TOKEN},
-                data={
-                    "target": t,
-                    "message": pesan
-                }
-            )
+        r = requests.post(
+            "https://api.fonnte.com/send",
+            headers={"Authorization": TOKEN},
+            data={
+                "target": t,
+                "message": pesan
+            }
+        )
+
+        # 👉 LANGKAH 3: LOG STATUS KIRIM (PENTING)
+        print(f"[WA SEND] target={t} status={r.status_code} response={r.text}")
 
     except Exception as e:
         # kirim ERROR HANYA ke WA pribadi
