@@ -18,6 +18,12 @@ TARGETS = [
     "120363402852110732@g.us"
 ]
 
+# NOMOR YANG AKAN DI-MENTION (KHUSUS GRUP)
+MENTION_USERS = [
+    "6283197511188",
+    "6281289285528"
+]
+
 # =========================
 # DATA PRODUK & LOKASI
 # =========================
@@ -53,14 +59,6 @@ LOKASI = [
     "BELM - Bekasi, Bekasi",
     "BELM - Juanda, Jakarta",
     "BELM - Puri Indah"
-]
-
-PRIORITAS_JAKARTA = [
-    "Jakarta",
-    "Pulogadung",
-    "Graha Dipta",
-    "Juanda",
-    "Puri Indah"
 ]
 
 # =========================
@@ -120,16 +118,33 @@ if TEST_MODE or (status_baru != status_lama and hasil):
 
     pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
 
+    # Buat mention text (KHUSUS GRUP)
+    mention_text = ""
+    for m in MENTION_USERS:
+        mention_text += f"@{m} "
+    mention_text += "\n\n"
+
     try:
         for t in TARGETS:
+            final_message = pesan
+
+            # Jika target grup → tambahkan mention
+            if t.endswith("@g.us"):
+                final_message = (
+                    "🚨 *BOT ALERT – PERHATIAN* 🚨\n"
+                    + mention_text
+                    + pesan
+                )
+
             r = requests.post(
                 "https://api.fonnte.com/send",
                 headers={"Authorization": TOKEN},
                 data={
                     "target": t,
-                    "message": pesan
+                    "message": final_message
                 }
             )
+
             print(f"[WA SEND] target={t} status={r.status_code}")
 
     except Exception as e:
