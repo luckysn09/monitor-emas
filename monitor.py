@@ -65,13 +65,6 @@ text = soup.get_text(separator=" ")
 
 hasil = {}
 
-# --- CATAT STATISTIK BUTIK ---
-jam_sekarang = datetime.now().hour
-
-for butik in hasil.keys():
-    with open(STAT_BUTIK_FILE, "a") as f:
-        f.write(f"{butik}|{jam_sekarang}\n")
-
 for lokasi in LOKASI:
     tersedia = []
     for gram in GRAM_LIST:
@@ -79,6 +72,12 @@ for lokasi in LOKASI:
             tersedia.append(gram)
     if tersedia:
         hasil[lokasi] = tersedia
+        # --- CATAT STATISTIK BUTIK ---
+jam_sekarang = datetime.now().hour
+
+for butik in hasil.keys():
+    with open(STAT_BUTIK_FILE, "a") as f:
+        f.write(f"{butik}|{jam_sekarang}\n")
 
 status_baru = str(hasil)
 
@@ -92,20 +91,20 @@ if TEST_MODE or (status_baru != status_lama and hasil):
     pesan = "🚨 UPDATE STOK EMAS LOGAM MULIA 🚨\n\n"
 
     # --- PRIORITAS JAKARTA ---
-for lokasi, grams in hasil.items():
-    if any(k in lokasi for k in PRIORITAS_JAKARTA):
-        pesan += f"📍 {lokasi} (PRIORITAS)\n"
-        for g in grams:
-            pesan += f"✅ {g}\n"
-        pesan += "\n"
+    for lokasi, grams in hasil.items():
+        if any(k in lokasi for k in PRIORITAS_JAKARTA):
+            pesan += f"📍 {lokasi} (PRIORITAS)\n"
+            for g in grams:
+                pesan += f"✅ {g}\n"
+            pesan += "\n"
 
-# --- LOKASI LAIN ---
-for lokasi, grams in hasil.items():
-    if not any(k in lokasi for k in PRIORITAS_JAKARTA):
-        pesan += f"📍 {lokasi}\n"
-        for g in grams:
-            pesan += f"✅ {g}\n"
-        pesan += "\n"
+    # --- LOKASI LAIN ---
+    for lokasi, grams in hasil.items():
+        if not any(k in lokasi for k in PRIORITAS_JAKARTA):
+            pesan += f"📍 {lokasi}\n"
+            for g in grams:
+                pesan += f"✅ {g}\n"
+            pesan += "\n"
 
     pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
 
