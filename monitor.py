@@ -85,34 +85,35 @@ if TEST_MODE or (status_baru != status_lama and hasil):
     pesan += f"⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}"
 
     try:
-    # kirim NOTIFIKASI STOK (pribadi + grup)
-    for t in TARGETS:
-        requests.post(
-            "https://api.fonnte.com/send",
-            headers={"Authorization": TOKEN},
-            data={
-                "target": t,
-                "message": pesan
-            }
-        )
+        # kirim NOTIFIKASI STOK (pribadi + grup)
+        for t in TARGETS:
+            requests.post(
+                "https://api.fonnte.com/send",
+                headers={"Authorization": TOKEN},
+                data={
+                    "target": t,
+                    "message": pesan
+                }
+            )
 
-except Exception as e:
-    # kirim ERROR HANYA ke WA pribadi
-    error_msg = f"""⚠️ BOT LOGAM MULIA ERROR ⚠️
+    except Exception as e:
+        # kirim ERROR HANYA ke WA pribadi
+        error_msg = f"""⚠️ BOT LOGAM MULIA ERROR ⚠️
 
 Pesan error:
 {str(e)}
 
 ⏰ {datetime.now().strftime('%d-%m-%Y %H:%M WIB')}
 """
-    requests.post(
-        "https://api.fonnte.com/send",
-        headers={"Authorization": TOKEN},
-        data={
-            "target": ADMIN_WA,
-            "message": error_msg
-        }
-    )
+        requests.post(
+            "https://api.fonnte.com/send",
+            headers={"Authorization": TOKEN},
+            data={
+                "target": ADMIN_WA,
+                "message": error_msg
+            }
+        )
 
+    # simpan status terakhir
     with open(STATUS_FILE, "w") as f:
         f.write(status_baru)
