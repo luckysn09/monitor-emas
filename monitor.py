@@ -11,7 +11,20 @@ TARGETS = [
     "E8l1KMRnTCUDG3ZbQWuQKX"
 ]
 
-GRAM_LIST = ["Emas Batangan - 0.5 gr", "Emas Batangan - 1 gr", "Emas Batangan - 2 gr", "Emas Batangan - 3 gr", Emas Batangan - 5 gr", "Emas Batangan - 10 gr", "Emas Batangan - 25 gr", "Emas Batangan - 50 gr", "Emas Batangan - 100 gr", "Emas Batangan - 250 gr", "Emas Batangan - 500 gr", "Emas Batangan - 1000gr"]
+GRAM_LIST = [
+    "Emas Batangan - 0.5 gr",
+    "Emas Batangan - 1 gr",
+    "Emas Batangan - 2 gr",
+    "Emas Batangan - 3 gr",
+    "Emas Batangan - 5 gr",
+    "Emas Batangan - 10 gr",
+    "Emas Batangan - 25 gr",
+    "Emas Batangan - 50 gr",
+    "Emas Batangan - 100 gr",
+    "Emas Batangan - 250 gr",
+    "Emas Batangan - 500 gr",
+    "Emas Batangan - 1000 gr"
+]
 
 LOKASI = [
     "BELM - Pengiriman Ekspedisi, Pulogadung Jakarta, Jakarta",
