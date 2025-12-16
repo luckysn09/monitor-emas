@@ -58,6 +58,7 @@ PRIORITAS_JAKARTA = [
 
 STATUS_FILE = "last_status.txt"
 STAT_BUTIK_FILE = "butik_stats.txt"
+STAT_SENT_FILE = "stat_sent_today.txt"
 
 res = requests.get(URL, timeout=20)
 soup = BeautifulSoup(res.text, "html.parser")
@@ -72,9 +73,9 @@ for lokasi in LOKASI:
             tersedia.append(gram)
     if tersedia:
         hasil[lokasi] = tersedia
-        # --- CATAT STATISTIK BUTIK ---
+        
+# --- CATAT STATISTIK BUTIK (SETELAH HASIL TERBENTUK) ---
 jam_sekarang = datetime.now().hour
-
 for butik in hasil.keys():
     with open(STAT_BUTIK_FILE, "a") as f:
         f.write(f"{butik}|{jam_sekarang}\n")
@@ -169,10 +170,16 @@ def statistik_butik_paling_sering():
 
     return hasil
 
-# --- KIRIM STATISTIK BUTIK JAM 22:00 WIB ---
+# --- KIRIM STATISTIK BUTIK JAM 22:00 WIB (ANTI DUPLIKASI) ---
 sekarang = datetime.now()
+today = sekarang.strftime("%Y-%m-%d")
 
-if sekarang.hour == 22:
+sent_today = ""
+if os.path.exists(STAT_SENT_FILE):
+    with open(STAT_SENT_FILE, "r") as f:
+        sent_today = f.read()
+
+if sekarang.hour == 22 and sent_today != today:
     stats = statistik_butik_paling_sering()
 
     if stats:
@@ -193,3 +200,7 @@ if sekarang.hour == 22:
                 "message": pesan
             }
         )
+
+        # 👉 SIMPAN FLAG HARIAN (PENTING)
+        with open(STAT_SENT_FILE, "w") as f:
+            f.write(today)
